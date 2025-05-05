@@ -2,62 +2,44 @@ import React, { useState } from 'react';
 import '../App.css';
 
 function AddItemForm({ onAddItem }) {
-  const [products, setProducts] = useState([
-    { name: '', quantity: 1 },
-    { name: '', quantity: 1 },
-    { name: '', quantity: 1 }
-  ]);
-
-  const handleChange = (index, field, value) => {
-    const updated = [...products];
-    updated[index][field] = field === 'quantity' ? parseInt(value) : value;
-    setProducts(updated);
-  };
+  const [name, setName] = useState('');
+  const [quantity, setQuantity] = useState(1);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const validItems = products.filter(p => p.name.trim() !== '' && p.quantity > 0 && p.quantity <= 8);
-
-    const hasDuplicates = new Set(validItems.map(p => p.name.toLowerCase())).size !== validItems.length;
-    if (hasDuplicates) {
-      alert('No se pueden repetir nombres de productos.');
+    if (name.trim() === '') {
+      alert('El nombre del producto no puede estar vacío.');
       return;
     }
 
-    if (validItems.length === 0) {
-      alert('Ingresá al menos un producto válido.');
+    if (quantity <= 0) {
+      alert('La cantidad debe ser mayor a 0.');
       return;
     }
 
-    const finalItems = validItems.map(p => ({ ...p, bought: false }));
-    onAddItem(finalItems);
-    setProducts([
-      { name: '', quantity: 1 },
-      { name: '', quantity: 1 },
-      { name: '', quantity: 1 }
-    ]);
+    onAddItem({ name: name.trim(), quantity });
+    setName('');
+    setQuantity(1);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      {products.map((product, index) => (
-        <div key={index} className="product-input-group">
-          <input
-            type="text"
-            placeholder={`Producto ${index + 1}`}
-            value={product.name}
-            onChange={(e) => handleChange(index, 'name', e.target.value)}
+      <div className="product-input-group">
+        <input
+          type="text"
+          placeholder="Nombre del producto"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
-          <input
-            type="number"
-            min="1"
-            max="8"
-            value={product.quantity}
-            onChange={(e) => handleChange(index, 'quantity', e.target.value)}
+        <input
+          type="number"
+          min="1"
+          max="99"
+          value={quantity}
+          onChange={(e) => setQuantity(parseInt(e.target.value))}
         />
-        </div>
-      ))}
+      </div>
       <button type="submit">Agregar</button>
     </form>
   );
